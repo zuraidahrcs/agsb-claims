@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AGSB Claims">
+<title>AGSB Claims</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+  :root {
+    --navy:#1f3a5f; --navy2:#2b4c78; --teal:#00969f; --gold:#e8b230; --page:#eef1f5; --card:#fff;
+    --ink:#1b1b1b; --ink2:#5f6368; --line:#dadce0; --err:#c5221f; --ok:#137333; --warn:#b06000;
+    --top: env(safe-area-inset-top, 0px); --bot: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; background:var(--page); color:var(--ink); }
+  body { font:16px/1.45 'Century Gothic', CenturyGothic, AppleGothic, 'URW Gothic', 'URW Gothic L', Futura, Arial, sans-serif; padding-bottom:calc(64px + var(--bot)); }
+  input, select, button, textarea { font-family:inherit; font-size:16px; }
+  .hidden { display:none !important; }
+
+  header { position:sticky; top:0; z-index:5; background:var(--navy); color:#fff; padding:calc(12px + var(--top)) 16px 12px; display:flex; align-items:center; gap:10px; }
+  header img { width:30px; height:30px; border-radius:8px; }
+  header h1 { margin:0; font-size:18px; font-weight:700; flex:1; }
+  .pill { font-size:12px; padding:3px 9px; border-radius:12px; background:rgba(255,255,255,.15); white-space:nowrap; }
+  .pill.off { background:var(--gold); color:#1b1b1b; }
+
+  main { max-width:640px; margin:0 auto; padding:12px 12px 24px; }
+  .card { background:var(--card); border-radius:14px; padding:16px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+  .card h2 { margin:0 0 10px; font-size:17px; color:var(--navy); }
+  .hint { color:var(--ink2); font-size:13.5px; }
+  .req { color:var(--err); }
+  label.f { display:block; margin-bottom:12px; }
+  label.f > span { display:block; font-size:13px; color:var(--ink2); margin-bottom:4px; }
+  input, select { width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); -webkit-appearance:none; appearance:none; min-height:46px; }
+  select { background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px; }
+  input:focus, select:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(0,150,159,.15); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:0 10px; }
+  .upper { text-transform:uppercase; }
+
+  button { cursor:pointer; border-radius:10px; padding:11px 16px; border:1px solid var(--line); background:#fff; color:var(--navy); font-weight:700; min-height:44px; }
+  button.pri { background:var(--navy); color:#fff; border-color:var(--navy); width:100%; font-size:17px; min-height:50px; }
+  button.ghost { border:0; background:none; color:var(--ink2); font-weight:400; font-size:14px; padding:8px 6px; min-height:0; }
+  button.wide { width:100%; }
+  button:disabled { opacity:.55; }
+
+  .chips { display:flex; gap:8px; overflow-x:auto; padding:2px 0 10px; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
+  .chip { flex:0 0 auto; border:1px solid var(--line); border-radius:18px; padding:7px 12px; font-size:13px; background:#f6f8fa; color:var(--ink); font-weight:400; min-height:0; }
+
+  .trip { border:1px solid var(--line); border-left:5px solid var(--teal); border-radius:12px; padding:12px; margin:10px 0; }
+  .trip.bad { border-left-color:var(--err); }
+  .trip .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .trip .top b { color:var(--navy); }
+  .trip .amt { font-weight:700; }
+  .trip .acts { display:flex; justify-content:flex-end; gap:4px; }
+
+  .bar { position:sticky; bottom:calc(64px + var(--bot)); z-index:4; background:var(--card); border-radius:14px; padding:12px 16px; box-shadow:0 -2px 10px rgba(0,0,0,.08); margin-bottom:12px; }
+  .bar .tot { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .bar .tot b { font-size:20px; }
+  .errors { color:var(--err); white-space:pre-line; font-size:14px; margin:0 0 8px; }
+
+  nav { position:fixed; left:0; right:0; bottom:0; z-index:6; background:#fff; border-top:1px solid var(--line); display:flex; padding-bottom:var(--bot); }
+  nav button { flex:1; border:0; border-radius:0; background:none; color:var(--ink2); font-weight:400; font-size:12px; padding:8px 0 10px; min-height:60px; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative; }
+  nav button svg { width:24px; height:24px; }
+  nav button.on { color:var(--navy); font-weight:700; }
+  nav .badge { position:absolute; top:5px; left:calc(50% + 6px); background:var(--gold); color:#1b1b1b; border-radius:9px; font-size:11px; font-weight:700; padding:0 6px; }
+
+  .status { display:inline-block; font-size:13px; font-weight:700; padding:4px 10px; border-radius:12px; background:#e8eaed; }
+  .status.Pending { background:#fef7e0; color:var(--warn); }
+  .status.Approved, .status.Paid { background:#e6f4ea; color:var(--ok); }
+  .status.Rejected { background:#fce8e6; color:var(--err); }
+  .line { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .line:last-child { border-bottom:0; }
+  .line .d { width:44px; flex:0 0 44px; text-align:center; color:var(--navy); font-weight:700; line-height:1.15; }
+  .line .d small { display:block; font-weight:400; color:var(--ink2); font-size:11px; }
+  .line .m { flex:1; min-width:0; }
+  .line .m div { overflow:hidden; text-overflow:ellipsis; }
+  .line .r { text-align:right; white-space:nowrap; font-weight:700; }
+  .line .r small { display:block; font-weight:400; color:var(--ink2); }
+  .line .m > div:first-child, .line .r { color:var(--ink); }
+  .big { font-size:26px; font-weight:700; color:var(--navy); }
+  .note { background:#fef7e0; border-radius:10px; padding:10px 12px; font-size:14px; margin-bottom:12px; }
+  .note.err { background:#fce8e6; }
+  .ok h2 { color:var(--ok); }
+  .footer { text-align:center; color:var(--ink2); font-size:12px; letter-spacing:.5px; margin:18px 0 6px; }
+  .center { text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <img src="icons/icon-192.png" alt="">
+  <h1>AGSB Claims</h1>
+  <span class="pill" id="net">Online</span>
+</header>
+
+<main>
+  <!-- First-time setup -->
+  <section id="vSetup" class="hidden">
+    <div class="card">
+      <h2>Welcome</h2>
+      <p class="hint" style="margin-top:0">Set up once on this phone. Your claims go straight to the AGSB claims sheet for approval.</p>
+      <label class="f"><span>Your name <b class="req">*</b></span><select id="sEmp"></select></label>
+      <label class="f" id="sCodeWrap"><span>Access code <b class="req">*</b></span><input id="sCode" type="password" autocomplete="off"></label>
+      <p class="errors" id="sErr"></p>
+      <button class="pri" id="sGo">Continue</button>
+    </div>
+    <div class="footer">designed by rcs</div>
+  </section>
+
+  <!-- Loading / not configured -->
+  <section id="vMsg" class="hidden"><div class="card center" id="msgBody">Loading…</div></section>
+
+  <!-- New claim -->
+  <section id="vNew" class="hidden">
+    <div id="outboxNote"></div>
+    <div class="card">
+      <h2>New claim</h2>
+      <div class="two">
+        <label class="f"><span>Month <b class="req">*</b></span><select id="month"></select></label>
+        <label class="f"><span>Vehicle no. <b class="req">*</b></span><input id="vehicle" class="upper" list="vehList" autocomplete="off" placeholder="BQF 292"></label>
+      </div>
+      <div class="hint" id="whoRate"></div>
+    </div>
+
+    <div class="card">
+      <h2>Trips</h2>
+      <div class="hint" style="margin-bottom:8px">Tap a saved route to fill in the next trip.</div>
+      <div class="chips" id="chips"></div>
+      <div id="trips"></div>
+      <button class="wide" id="addTrip">+ Add trip</button>
+    </div>
+
+    <div class="bar">
+      <div class="tot"><span class="hint" id="totSub">0 trips · 0 km</span><b id="tot">RM 0.00</b></div>
+      <p class="errors" id="errs"></p>
+      <button class="pri" id="submit">Submit claim</button>
+    </div>
+    <div class="footer">designed by rcs</div>
+  </section>
+
+  <!-- After submit -->
+  <section id="vDone" class="hidden">
+    <div class="card ok center">
+      <h2 id="doneH">Claim submitted</h2>
+      <p id="doneTxt"></p>
+      <button class="pri" id="again">New claim</button>
+      <button class="ghost" id="toMine" style="margin-top:8px">See my claims</button>
+    </div>
+  </section>
+
+  <!-- My claims -->
+  <section id="vMine" class="hidden">
+    <div class="card">
+      <h2>My claims</h2>
+      <label class="f"><span>Month</span><select id="mMonth"></select></label>
+      <div id="mBody" class="hint">Loading…</div>
+    </div>
+    <div id="mQueue"></div>
+    <div class="footer">designed by rcs</div>
+  </section>
+
+  <!-- Me -->
+  <section id="vMe" class="hidden">
+    <div class="card">
+      <h2>This phone</h2>
+      <p style="margin:0 0 4px"><b id="meName"></b></p>
+      <p class="hint" style="margin:0 0 12px" id="meRate"></p>
+      <button class="wide" id="meSwitch">Change name or access code</button>
+    </div>
+    <div class="card" id="installCard">
+      <h2>Install the app</h2>
+      <button class="pri" id="installBtn">Install AGSB Claims</button>
+      <p class="hint" id="iosHint">On iPhone: open this page in Safari, tap <b>Share</b>, then <b>Add to Home Screen</b>.<br>On Android: open the Chrome menu <b>⋮</b>, then <b>Add to Home screen</b> or <b>Install app</b>.</p>
+    </div>
+    <div class="card">
+      <h2>Refresh lists</h2>
+      <p class="hint" style="margin-top:0">Names, claim types, saved routes and the rate come from the Settings tab of the claims sheet.</p>
+      <button class="wide" id="meRefresh">Refresh now</button>
+      <p class="hint" id="meSynced"></p>
+    </div>
+    <div class="footer">designed by rcs</div>
+  </section>
+</main>
+
+<nav id="nav" class="hidden">
+  <button data-v="vNew" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New claim</button>
+  <button data-v="vMine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>My claims<span class="badge hidden" id="qBadge"></span></button>
+  <button data-v="vMe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Me</button>
+</nav>
+
+<datalist id="routeList"></datalist>
+<datalist id="vehList"></datalist>
+<datalist id="purposeList"></datalist>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
