@@ -1,10 +1,10 @@
 // Keeps the app's own files on the phone so it opens without signal.
 // Claims are never cached here; the app keeps unsent claims itself and sends them when back online.
-const VERSION = 'agsb-claims-v1';
+const VERSION = 'agsb-claims-v2';
 const FILES = [
   './', './index.html', './app.js', './config.js', './manifest.webmanifest',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png',
-  './icons/apple-touch-icon.png', './icons/favicon.png'
+  './icon-192.png', './icon-512.png', './maskable-512.png',
+  './apple-touch-icon.png', './favicon.png'
 ];
 
 self.addEventListener('install', function (e) {
