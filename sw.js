@@ -1,6 +1,6 @@
 // Keeps the app's own files on the phone so it opens without signal.
 // Claims are never cached here; the app keeps unsent claims itself and sends them when back online.
-const VERSION = 'agsb-claims-v2';
+const VERSION = 'agsb-claims-v4';
 const FILES = [
   './', './index.html', './app.js', './config.js', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './maskable-512.png',

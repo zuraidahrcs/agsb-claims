@@ -26,7 +26,13 @@
 
   header { position:sticky; top:0; z-index:5; background:var(--navy); color:#fff; padding:calc(12px + var(--top)) 16px 12px; display:flex; align-items:center; gap:10px; }
   header img { width:30px; height:30px; border-radius:8px; }
-  header h1 { margin:0; font-size:18px; font-weight:700; flex:1; }
+  header h1 { margin:0; font-size:18px; font-weight:700; flex:1; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  header h1 small { font-size:13px; opacity:.8; }
+  .co { display:flex; align-items:center; gap:14px; width:100%; text-align:left; padding:16px; margin-bottom:10px; border:1.5px solid var(--line); border-radius:14px; background:#fff; min-height:76px; }
+  .co.on { border-color:var(--teal); box-shadow:0 0 0 3px rgba(0,150,159,.12); }
+  .co .ic { width:46px; height:46px; border-radius:12px; flex:0 0 46px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:17px; font-weight:700; }
+  .co b { display:block; font-size:17px; color:var(--navy); }
+  .co span.s { display:block; font-size:13px; color:var(--ink2); font-weight:400; }
   .pill { font-size:12px; padding:3px 9px; border-radius:12px; background:rgba(255,255,255,.15); white-space:nowrap; }
   .pill.off { background:var(--gold); color:#1b1b1b; }
 
@@ -90,21 +96,70 @@
   .ok h2 { color:var(--ok); }
   .footer { text-align:center; color:var(--ink2); font-size:12px; letter-spacing:.5px; margin:18px 0 6px; }
   .center { text-align:center; }
+
+  .seg { display:flex; background:#e3e7ee; border-radius:12px; padding:4px; margin-bottom:12px; }
+  .seg button { flex:1; border:0; background:none; color:var(--ink2); font-weight:700; min-height:40px; border-radius:9px; font-size:15px; padding:8px 6px; }
+  .seg button.on { background:#fff; color:var(--navy); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+  .rc { display:flex; gap:12px; align-items:center; margin-bottom:6px; }
+  .rc .thumb { width:64px; height:64px; border-radius:10px; border:1px solid var(--line); background:#f6f8fa center/cover no-repeat; flex:0 0 64px; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--ink2); text-align:center; }
+  .rc label.pick { flex:1; display:block; text-align:center; border:1.5px dashed var(--teal); color:var(--teal); border-radius:10px; padding:12px 8px; font-weight:700; cursor:pointer; }
+  .rc label.pick.has { border-style:solid; color:var(--ink2); font-weight:400; font-size:14px; }
+  .rc input[type=file] { display:none; }
+  .money { position:relative; }
+  .money input { padding-left:44px; }
+  .money:before { content:'RM'; position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--ink2); font-size:15px; }
+  .dl { margin-top:12px; }
+  #printArea { display:none; }
+
+  @media print {
+    @page { size:A4; margin:14mm 12mm; }
+    body { background:#fff; padding:0; font-size:11pt; }
+    body > *:not(#printArea) { display:none !important; }
+    #printArea { display:block !important; color:#000; }
+  }
+  .pf h1 { text-align:center; font-size:16pt; margin:0; letter-spacing:.5px; }
+  .pf h2 { text-align:center; font-size:13pt; margin:4px 0 14px; font-weight:400; }
+  .pf .info { width:100%; border-collapse:collapse; margin-bottom:10px; font-size:10.5pt; }
+  .pf .info td { padding:3px 6px; }
+  .pf .info td.k { width:22%; color:#444; }
+  .pf table.items { width:100%; border-collapse:collapse; font-size:10pt; }
+  .pf table.items th, .pf table.items td { border:1px solid #777; padding:4px 6px; vertical-align:top; }
+  .pf table.items th { background:#e9edf3; text-align:left; }
+  .pf table.items td.n, .pf table.items th.n { text-align:right; white-space:nowrap; }
+  .pf table.items tr.tot td { font-weight:700; background:#f4f6f9; }
+  .pf .sign { display:flex; justify-content:space-between; margin-top:34px; font-size:10.5pt; }
+  .pf .sign div { width:44%; }
+  .pf .sign .line { border-bottom:1px solid #000; height:46px; margin:6px 0 4px; }
+  .pf .foot { margin-top:18px; font-size:8.5pt; color:#666; text-align:center; }
+  .pf .rpage { page-break-before:always; }
+  .pf .rbox { page-break-inside:avoid; margin:0 0 10mm; text-align:center; }
+  .pf .rbox img { max-width:100%; max-height:115mm; border:1px solid #ccc; }
+  .pf .rbox p { margin:4px 0 0; font-size:9.5pt; }
 </style>
 </head>
 <body>
 <header>
   <img src="icon-192.png" alt="">
-  <h1>AGSB Claims</h1>
+  <h1 id="coBtn" role="button" tabindex="0"><span id="coName">AGSB Claims</span> <small id="coCaret">▾</small></h1>
   <span class="pill" id="net">Online</span>
 </header>
 
 <main>
+  <!-- Choose company -->
+  <section id="vCo" class="hidden">
+    <div class="card">
+      <h2>Choose company</h2>
+      <p class="hint" style="margin-top:0">Claims are saved to that company's own claims sheet. You can switch any time by tapping the company name at the top.</p>
+      <div id="coList"></div>
+    </div>
+    <div class="footer">designed by rcs</div>
+  </section>
+
   <!-- First-time setup -->
   <section id="vSetup" class="hidden">
     <div class="card">
       <h2>Welcome</h2>
-      <p class="hint" style="margin-top:0">Set up once on this phone. Your claims go straight to the AGSB claims sheet for approval.</p>
+      <p class="hint" style="margin-top:0">Set up once on this phone for <b id="sCo"></b>. Your claims go straight to its claims sheet for approval.</p>
       <label class="f"><span>Your name <b class="req">*</b></span><select id="sEmp"></select></label>
       <label class="f" id="sCodeWrap"><span>Access code <b class="req">*</b></span><input id="sCode" type="password" autocomplete="off"></label>
       <p class="errors" id="sErr"></p>
@@ -119,6 +174,8 @@
   <!-- New claim -->
   <section id="vNew" class="hidden">
     <div id="outboxNote"></div>
+    <div class="seg" id="segNew"><button data-k="m" class="on">Mileage</button><button data-k="e">Meal &amp; expenses</button></div>
+    <div id="mileNew">
     <div class="card">
       <h2>New claim</h2>
       <div class="two">
@@ -141,6 +198,26 @@
       <p class="errors" id="errs"></p>
       <button class="pri" id="submit">Submit claim</button>
     </div>
+    </div>
+
+    <div id="expNew" class="hidden">
+      <div class="card">
+        <h2>Meal &amp; expense claim</h2>
+        <label class="f"><span>Month <b class="req">*</b></span><select id="eMonth"></select></label>
+        <div class="hint" id="eWho"></div>
+      </div>
+      <div class="card">
+        <h2>Items</h2>
+        <div class="hint" style="margin-bottom:4px">Every item needs a photo or PDF of its receipt.</div>
+        <div id="eItems"></div>
+        <button class="wide" id="eAdd">+ Add item</button>
+      </div>
+      <div class="bar">
+        <div class="tot"><span class="hint" id="eTotSub">0 items</span><b id="eTot">RM 0.00</b></div>
+        <p class="errors" id="eErrs"></p>
+        <button class="pri" id="eSubmit">Submit claim</button>
+      </div>
+    </div>
     <div class="footer">designed by rcs</div>
   </section>
 
@@ -158,8 +235,11 @@
   <section id="vMine" class="hidden">
     <div class="card">
       <h2>My claims</h2>
+      <div class="seg" id="segMine"><button data-k="m" class="on">Mileage</button><button data-k="e">Meal &amp; expenses</button></div>
       <label class="f"><span>Month</span><select id="mMonth"></select></label>
       <div id="mBody" class="hint">Loading…</div>
+      <button class="wide dl hidden" id="mDownload">⬇ Download claim form (PDF)</button>
+      <p class="hint hidden" id="mDlHint">Choose <b>Save as PDF</b> in the print screen to keep a copy, or print it for signing.</p>
     </div>
     <div id="mQueue"></div>
     <div class="footer">designed by rcs</div>
@@ -170,8 +250,10 @@
     <div class="card">
       <h2>This phone</h2>
       <p style="margin:0 0 4px"><b id="meName"></b></p>
+      <p class="hint" style="margin:0 0 4px" id="meCo"></p>
       <p class="hint" style="margin:0 0 12px" id="meRate"></p>
       <button class="wide" id="meSwitch">Change name or access code</button>
+      <button class="wide" id="meCompany" style="margin-top:8px">Change company</button>
     </div>
     <div class="card" id="installCard">
       <h2>Install the app</h2>
@@ -193,6 +275,8 @@
   <button data-v="vMine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>My claims<span class="badge hidden" id="qBadge"></span></button>
   <button data-v="vMe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Me</button>
 </nav>
+
+<div id="printArea"></div>
 
 <datalist id="routeList"></datalist>
 <datalist id="vehList"></datalist>
